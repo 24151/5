@@ -1,0 +1,403 @@
+//11 практика
+#include <stdio.h>
+#include <math.h>
+
+double recursiveSum(double x, int n, double sum, double currentTerm) {
+    if(fabs(currentTerm) < 0.001) { // условие точности
+        return sum;
+    }
+    else {
+        return recursiveSum(x, n+1, sum + currentTerm, currentTerm * (-1) * x * x / (2*n) / (2*n-1)); // рекурсивный вызов
+    }
+}
+
+int main() {
+    double x = 0.5; // значение x
+    double sum = 1; // начальное значение суммы
+    double currentTerm = 1; // начальное значение текущего члена
+    int n = 1; // начальное количество членов
+
+    double result = recursiveSum(x, n, sum, currentTerm);
+
+    printf("Значение суммы: %fn", result);
+    printf("Количество членов ряда: %dn", n);
+
+    return 0;
+}
+
+//11 защита
+#include <iostream>
+
+int count_even_elements(int arr[], int start, int end) {
+    if (start >= end) {
+        return 0;
+    }
+    
+    int mid = start + (end - start) / 2;
+    int count = count_even_elements(arr, mid + 1, end);
+    
+    if (arr[mid] % 2 == 0) {
+        return count + 1;
+    }
+    
+    return count;
+}
+
+int main() {
+    int size;
+    std::cout << "Enter size of the array: ";
+    std::cin >> size;
+    
+    int* arr = new int[size];
+    
+    std::cout << "Enter elements of the array: ";
+    for (int i = 0; i < size; i++) {
+        std::cin >> arr[i];
+    }
+    
+    int count = count_even_elements(arr, size / 2, size);
+    
+    std::cout << "Number of even elements in the second half of the array: " << count << std::endl;
+    
+    delete[] arr;
+    
+    return 0;
+}
+//12 практика
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+struct Date {
+    int day;
+    int month;
+    int year;
+};
+
+void printInfo(Date date) {
+    // Декада
+    int decade = (date.year % 100) / 10 + 1;
+
+    // Сезон
+    string season;
+    switch(date.month) {
+        case 1:
+        case 2:
+        case 12:
+            season = "winter";
+            break;
+        case 3:
+        case 4:
+        case 5:
+            season = "spring";
+            break;
+        case 6:
+        case 7:
+        case 8:
+            season = "summer";
+            break;
+        case 9:
+        case 10:
+        case 11:
+            season = "autumn";
+            break;
+    }
+
+    // Век
+    int century = date.year / 100 + 1;
+
+    cout << "Born in the " << decade << " decade, in the " << season << ", in the " << century << " century." << endl;
+}
+
+int main() {
+    int N;
+    cout << "Enter the number of people: ";
+    cin >> N;
+
+    Date* people = new Date[N];
+
+    for (int i = 0; i < N; i++) {
+        cout << "Enter birth date (dd mm yyyy) for person " << i+1 << ": ";
+        cin >> people[i].day >> people[i].month >> people[i].year;
+    }
+
+    for (int i = 0; i < N; i++) {
+        cout << "Person " << i+1 << ": ";
+        printInfo(people[i]);
+    }
+
+    delete [] people;
+
+    return 0;
+}
+//13 практика
+
+//14 практика
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#define MAX_LINES 100
+#define MAX_WORDS 50
+#define MAX_LENGTH 256
+
+int main() {
+  FILE *file;
+  char filename[MAX_LENGTH] = "output.txt";
+  char buffer[MAX_LENGTH];
+  char words[MAX_WORDS][MAX_LENGTH];
+  int number_of_lines = 0;
+  int longest_line_index = -1;
+
+  // Open a file for writing
+  file = fopen(filename, "w");
+
+  if (file == NULL) {
+    printf("Error opening file!\n");
+    exit(1);
+  }
+
+  // Generate random number of lines
+  srand(time(NULL));
+  number_of_lines = rand() % MAX_LINES + 1;
+
+  for (int i = 0; i < number_of_lines; i++) {
+    // Read a line from the input
+    fgets(buffer, MAX_LENGTH, stdin);
+
+    // Split the line into words
+    char *word = strtok(buffer, " ");
+    int word_index = 0;
+    while (word != NULL) {
+      strcpy(words[word_index], word);
+      word = strtok(NULL, " ");
+      word_index++;
+    }
+
+    // Check if this line has the longest length
+    if (word_index > longest_line_index) {
+      longest_line_index = word_index;
+    }
+
+    // Write the line to the output file
+    fprintf(file, "%s\n", buffer);
+  }
+
+  // Swap the first and last words of the longest line
+  if (longest_line_index > 0) {
+    char temp[MAX_LENGTH];
+    strcpy(temp, words[0]);
+    strcpy(words[0], words[longest_line_index - 1]);
+    strcpy(words[longest_line_index - 1], temp);
+  }
+
+  // Write the modified longest line back to the file
+  fseek(file, -1, SEEK_END);
+  fputs(words[0], file);
+
+  // Close the file
+  fclose(file);
+
+  printf("File '%s' has been created with the modified longest line.\n",
+         filename);
+  return 0;
+}
+//15 практика
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+typedef struct {
+    char destination[100];
+    int train_number;
+    int hours;
+    int minutes;
+} Train;
+
+int compare_times(const void* a, const void* b) {
+    const Train* time_a = (const Train*)a;
+    const Train* time_b = (const Train*)b;
+    if (time_a->hours < time_b->hours) return -1;
+    if (time_a->hours > time_b->hours) return 1;
+    if (time_a->minutes < time_b->minutes) return -1;
+    if (time_a->minutes > time_b->minutes) return 1;
+    return 0;
+}
+
+int main() {
+    FILE* file = fopen("Train.dat", "rb");
+    if (file == NULL) {
+        printf("Failed to open file\n");
+        return 1;
+    }
+
+    int count;
+    fseek(file, 0, SEEK_END);
+    count = ftell(file) / sizeof(Train);
+    fseek(file, 0, SEEK_SET);
+
+    Train* trains = (Train*)malloc(count * sizeof(Train));
+    if (trains == NULL) {
+        printf("Failed to allocate memory\n");
+        fclose(file);
+        return 1;
+    }
+
+    fread(trains, sizeof(Train), count, file);
+    fclose(file);
+
+    qsort(trains, count, sizeof(Train), compare_times);
+
+    time_t current_time = time(NULL);
+    struct tm* local_time = localtime(&current_time);
+    int input_hours = local_time->tm_hour;
+    int input_minutes = local_time->tm_min;
+
+    int found = 0;
+    for (int i = 0; i < count; i++) {
+        if (trains[i].hours > input_hours || (trains[i].hours == input_hours && trains[i].minutes >= input_minutes)) {
+            printf("Train %d to %s is departing after %02d:%02d\n", trains[i].train_number, trains[i].destination, trains[i].hours, trains[i].minutes);
+            found = 1;
+        }
+    }
+
+    if (!found) {
+        printf("No trains are departing after the given time.\n");
+    }
+
+    free(trains);
+    return 0;
+}
+//16 практика
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    struct Node* nextList;
+    int data;              
+    struct Node* nextNode;
+} Node;
+
+Node* addNode(Node* head, int data, Node** tail) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->nextNode = NULL;
+    newNode->nextList = NULL;
+
+    if (head == NULL) {
+        *tail = newNode;
+        return newNode;
+    } else {
+        (*tail)->nextNode = newNode;
+        *tail = newNode; 
+        return head;
+    }
+}
+Node* addNodeS(Node* head, int data, Node** tail) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->nextNode = NULL;
+    newNode->nextList = NULL;
+
+    if (head == NULL) {
+        *tail = newNode;
+        return newNode;
+    } else {
+        //newNode->nextList=(*tail);
+        newNode->nextList=*tail;
+        *tail = newNode; 
+        return head;
+    }
+}
+
+void printList(Node* head) {
+    Node* current = head;
+    while (current != NULL) {
+        printf("%d ", current->data);
+        current = current->nextNode;
+    }
+    printf("\n");
+}
+
+void freeList(Node* head) {
+    Node* temp;
+    while (head != NULL) {
+        temp = head;
+        head = head->nextNode;
+        free(temp);
+    }
+}
+
+int main() {
+    Node* firstList = NULL; 
+    Node* secondList = NULL; 
+    Node *firstTail = NULL, *secondTail = NULL;
+    Node* S = NULL;
+    int data, count = 0;
+
+    printf("Введите последовательность чисел (0 для окончания ввода)\n");
+    while (1) {
+        scanf("%d", &data);
+        if (data == 0) break;
+
+        count++;
+        if (count % 2 == 1) {
+            firstList = addNode(firstList, data, &firstTail);
+            if (S == NULL) {S = firstList;firstTail->nextList=NULL;}
+        } else {
+            secondList = addNodeS(secondList, data, &secondTail);
+            if (count==2) secondTail->nextList=firstList;
+            else firstTail->nextList=secondTail;
+            //secondTail->nextNode=NULL;
+        }
+    }
+
+    if (firstTail && secondTail) {
+        firstTail->nextList = secondTail;
+    }
+
+    printf("Первый список:\n");
+    printList(firstList);
+    
+    printf("Второй список:\n");
+    printList(secondList);
+
+    printf("Press 'a' to go left and 'd' to go right. Any other key to exit\n");
+    Node *lst_ptr = firstList;
+    Node* Snd_ptr = secondList;
+    char c;
+    getchar();
+    while(1) {
+        char key = 'f';
+
+        printf("Value: %d; Addr prev: %p next: %p\n", lst_ptr->data, lst_ptr->nextList, lst_ptr->nextNode);
+        scanf("%c%*c", &key);
+        
+
+        printf("Key entered: '%c'\n", key);
+        if (key == 'a') {
+            if (lst_ptr->nextList)
+                lst_ptr = lst_ptr->nextList;
+            else 
+                printf("Can't go here: prev is NULL\n");
+            
+        } else if(key == 'd') {
+            if (lst_ptr->nextNode)
+                lst_ptr = lst_ptr->nextNode;
+            else
+                printf("Can't go here: next is NULL\n");
+
+        } else {
+            printf("Exiting..\n");
+            break;
+        }
+    }
+
+    freeList(firstList);
+    freeList(secondList);
+
+    return 0;
+}
